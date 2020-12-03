@@ -9,8 +9,7 @@ import HallOfFame, { FAKE_HOF } from './HallOfFame'
 import HighScoreInput from './HighScoreInput'
 
 const SIDE = 6
-const SYMBOLS = '😀🎉💖🎩🐶🐱🦄🐬🌍🌛🌞💫🍎🍌🍓🍐🍟🍿'
-
+export const SYMBOLS = '😀🎉💖🎩🐶🐱🦄🐬🌍🌛🌞💫🍎🍌🍓🍐🍟🍿'
 const VISUAL_PAUSE_MSECS = 750
 
 class App extends Component {
@@ -18,8 +17,13 @@ class App extends Component {
     cards: this.generateCards(),
     currentPair: [],
     guesses: 0,
+    hallOfFame: null,
     matchedCardIndices: [],
-    hallOfFame: null
+  }
+
+  // Arrow fx for binding
+  displayHallOfFame = hallOfFame => {
+    this.setState({ hallOfFame })
   }
 
   generateCards() {
@@ -31,23 +35,6 @@ class App extends Component {
       result.push(card, card)
     }
     return shuffle(result)
-  }
-
-  // Arrow fx for binding
-  handleCardClick = index => {
-    const { currentPair } = this.state
-
-    if (currentPair.length === 2) {
-      return
-    }
-
-    if (currentPair.length === 0) {
-      this.setState({currentPair: [index]})
-      return
-    }
-
-    this.handleNewPairClosedBy(index)
-
   }
 
   getFeedbackForCard(index) {
@@ -65,21 +52,33 @@ class App extends Component {
     return indexMatched ? 'visible' : 'hidden'
   }
 
+  // Arrow fx for binding
+  handleCardClick = index => {
+    const { currentPair } = this.state
+
+    if (currentPair.length === 2) {
+      return
+    }
+
+    if (currentPair.length === 0) {
+      this.setState({ currentPair: [index] })
+      return
+    }
+
+    this.handleNewPairClosedBy(index)
+  }
+
   handleNewPairClosedBy(index) {
     const { cards, currentPair, guesses, matchedCardIndices } = this.state
 
     const newPair = [currentPair[0], index]
     const newGuesses = guesses + 1
     const matched = cards[newPair[0]] === cards[newPair[1]]
-    this.setState({currentPair: newPair, guesses: newGuesses})
+    this.setState({ currentPair: newPair, guesses: newGuesses })
     if (matched) {
-      this.setState({matchedCardIndices: [...matchedCardIndices, ...newPair]})
+      this.setState({ matchedCardIndices: [...matchedCardIndices, ...newPair] })
     }
-    setTimeout(() => this.setState({currentPair: []}), VISUAL_PAUSE_MSECS)
-  }
-
-  displayHallOfFame = (hallOfFame) => {
-    this.setState({hallOfFame})
+    setTimeout(() => this.setState({ currentPair: [] }), VISUAL_PAUSE_MSECS)
   }
 
   render() {
@@ -87,24 +86,25 @@ class App extends Component {
     const won = matchedCardIndices.length === cards.length
     return (
       <div className="memory">
-        <GuessCount guesses={0} />
+        <GuessCount guesses={guesses} />
         {cards.map((card, index) => (
           <Card
             card={card}
             feedback={this.getFeedbackForCard(index)}
-            key={index}
             index={index}
+            key={index}
             onClick={this.handleCardClick}
           />
         ))}
-        {
-          won && 
-            (hallOfFame ? (
-              <HallOfFame entries={hallOfFame} />
-            ) : (
-              <HighScoreInput guesses={guesses} onStored={this.displayHallOfFame} />
-            ))
-        }
+        {won &&
+          (hallOfFame ? (
+            <HallOfFame entries={hallOfFame} />
+          ) : (
+            <HighScoreInput
+              guesses={guesses}
+              onStored={this.displayHallOfFame}
+            />
+          ))}
       </div>
     )
   }

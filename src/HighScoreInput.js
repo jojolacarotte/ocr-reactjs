@@ -6,27 +6,34 @@ import './HighScoreInput.css'
 import { saveHOFEntry } from './HallOfFame'
 
 class HighScoreInput extends Component {
-    state = { winner : ''}
+  state = { winner: '' }
 
-    handleWinnerUpdate = (event) => {
-        this.setState({winner: event.target.value.toUpperCase()})
-    }
+  // Arrow fx for binding
+  handleWinnerUpdate = event => {
+    this.setState({ winner: event.target.value.toUpperCase() })
+  }
 
-    persistWinner = (event) => {
-        event.preventDefault()
-        const newEntry = { guesses: this.props.guesses, player: this.state.winner}
-        saveHOFEntry(newEntry, this.props.onStored)
-    }
+  // Arrow fx for binding
+  persistWinner = event => {
+    event.preventDefault()
+    const newEntry = { guesses: this.props.guesses, player: this.state.winner }
+    saveHOFEntry(newEntry, this.props.onStored)
+  }
 
   render() {
     return (
       <form className="highScoreInput" onSubmit={this.persistWinner}>
         <p>
           <label>
-            Bravo ! Entre ton prénom :
-            <input type="text" autoComplete="given-name" type="text" value={this.state.winner} onChange={this.handleWinnerUpdate} />
+            Bravo ! Entre ton prénom :
+            <input
+              autoComplete="given-name"
+              type="text"
+              onChange={this.handleWinnerUpdate}
+              value={this.state.winner}
+            />
           </label>
-          <button type="submit">J’ai gagné !</button>
+          <button type="submit">J’ai gagné !</button>
         </p>
       </form>
     )
